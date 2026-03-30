@@ -3,6 +3,12 @@
 import { useEffect, useState } from 'react'
 import Nav from './components/Nav'
 
+export const metadata = {
+  title: "$FUZZY Rich List — Top Holders on the XRP Ledger",
+  description:
+    "See the top $FUZZY holders on the XRP Ledger. Live wallet rankings, balance distribution, supply breakdown, and percentile stats.",
+}
+
 interface Holder {
   account: string
   balance: string
