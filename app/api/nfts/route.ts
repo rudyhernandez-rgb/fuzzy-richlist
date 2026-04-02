@@ -35,17 +35,16 @@ export async function GET() {
       )
     ])
 
-    const xrpltoRaw = await xrpltoRes.json()
+    const col = await xrpltoRes.json()
     const salesData = await salesRes.json()
 
-    const col = xrpltoRaw?.collection || xrpltoRaw?.data || xrpltoRaw || {}
-
     const floorXrp = col?.floor || null
-    const totalNfts = col?.items || col?.totalNFTsMinted || 3211
+    const totalNfts = col?.items || 3211
     const totalOwners = col?.owners || 642
     const totalVolume = col?.totalVolume || null
-    const listed = col?.listedCount && col?.items
-      ? parseFloat(((col.listedCount / col.items) * 100).toFixed(1))
+    const listedCount = col?.listedCount || 0
+    const listed = listedCount && totalNfts
+      ? parseFloat(((listedCount / totalNfts) * 100).toFixed(1))
       : null
 
     const sales = (salesData?.sales || []).map((sale: any) => {
