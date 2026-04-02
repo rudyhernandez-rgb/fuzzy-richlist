@@ -21,6 +21,14 @@ interface NFTStats {
   totalVolume: number | null
   listed: number | null
   sales: Sale[]
+  vol24h: number | null
+  sales24h: number | null
+  totalSales: number | null
+  marketcap: number | null
+  topOffer: number | null
+  floor1dPercent: number | null
+  floor7dPercent: number | null
+  floor30dPercent: number | null
 }
 
 function shortAddr(addr: string) {
@@ -35,6 +43,16 @@ function timeAgo(dateStr: string) {
   if (diff < 3600) return Math.floor(diff / 60) + 'm ago'
   if (diff < 86400) return Math.floor(diff / 3600) + 'h ago'
   return Math.floor(diff / 86400) + 'd ago'
+}
+
+function pctColor(val: number | null) {
+  if (val === null) return '#888'
+  return val >= 0 ? '#639922' : '#F09595'
+}
+
+function pctLabel(val: number | null) {
+  if (val === null) return '...'
+  return (val >= 0 ? '▲ ' : '▼ ') + Math.abs(val).toFixed(1) + '%'
 }
 
 export default function NFTs() {
@@ -71,6 +89,13 @@ export default function NFTs() {
     { label: 'TOTAL VOLUME', value: stats?.totalVolume ? (stats.totalVolume / 1_000_000).toFixed(1) + 'M XRP' : '...', sub: 'all-time traded' },
     { label: 'LISTED', value: stats?.listed ? stats.listed.toFixed(1) + '%' : '...', sub: 'currently for sale' },
   ]
+
+  const sideRow = (label: string, value: string, valueColor?: string) => (
+    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontSize: '13px' }}>
+      <span style={{ color: '#888' }}>{label}</span>
+      <span style={{ fontWeight: '500', color: valueColor || 'white' }}>{value}</span>
+    </div>
+  )
 
   return (
     <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', fontFamily: 'sans-serif', color: 'white' }}>
@@ -145,6 +170,32 @@ export default function NFTs() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
+            {/* Floor price card */}
+            <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
+              <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '12px' }}>FLOOR PRICE</div>
+              <div style={{ fontSize: '28px', fontWeight: '500', color: '#FAC775' }}>
+                {stats?.floorXrp ? stats.floorXrp.toLocaleString() + ' XRP' : '...'}
+              </div>
+              <div style={{ fontSize: '13px', color: '#888', marginTop: '4px', marginBottom: '12px' }}>
+                {stats?.floorXrp ? toUsd(stats.floorXrp) + ' USD' : ''}
+              </div>
+              <div style={{ height: '1px', background: '#222', margin: '10px 0' }}></div>
+              {sideRow('24h change', pctLabel(stats?.floor1dPercent ?? null), pctColor(stats?.floor1dPercent ?? null))}
+              {sideRow('7d change', pctLabel(stats?.floor7dPercent ?? null), pctColor(stats?.floor7dPercent ?? null))}
+              {sideRow('30d change', pctLabel(stats?.floor30dPercent ?? null), pctColor(stats?.floor30dPercent ?? null))}
+            </div>
+
+            {/* Market stats card */}
+            <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
+              <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '12px' }}>MARKET STATS</div>
+              {sideRow('24h volume', stats?.vol24h ? stats.vol24h.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' XRP' : '...')}
+              {sideRow('24h sales', stats?.sales24h ? stats.sales24h.toString() : '...')}
+              {sideRow('All-time sales', stats?.totalSales ? stats.totalSales.toLocaleString() : '...')}
+              {sideRow('Market cap', stats?.marketcap ? (stats.marketcap / 1_000_000).toFixed(2) + 'M XRP' : '...')}
+              {sideRow('Top offer', stats?.topOffer ? stats.topOffer.toLocaleString() + ' XRP' : '...')}
+            </div>
+
+            {/* Collection info card */}
             <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
               <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '12px' }}>COLLECTION INFO</div>
               {[
@@ -164,16 +215,6 @@ export default function NFTs() {
                   style={{ fontSize: '12px', color: '#FAC775', textDecoration: 'none' }}>
                   View on XRP Cafe →
                 </a>
-              </div>
-            </div>
-
-            <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
-              <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '12px' }}>FLOOR PRICE</div>
-              <div style={{ fontSize: '28px', fontWeight: '500', color: '#FAC775' }}>
-                {stats?.floorXrp ? stats.floorXrp.toLocaleString() + ' XRP' : '...'}
-              </div>
-              <div style={{ fontSize: '13px', color: '#888', marginTop: '4px' }}>
-                {stats?.floorXrp ? toUsd(stats.floorXrp) + ' USD' : ''}
               </div>
             </div>
 

@@ -80,6 +80,14 @@ export async function GET() {
       totalVolume,
       listed,
       sales,
+      vol24h: col?.vol24h || null,
+      sales24h: col?.sales24h || null,
+      totalSales: col?.totalSales || null,
+      marketcap: col?.marketcap?.amount || null,
+      topOffer: col?.topOffer?.amount || null,
+      floor1dPercent: col?.floor1dPercent || null,
+      floor7dPercent: col?.floor7dPercent || null,
+      floor30dPercent: col?.floor30dPercent || null,
     }
 
     cache = { data: result, timestamp: now }
