@@ -38,17 +38,15 @@ export async function GET() {
     const xrpltoRaw = await xrpltoRes.json()
     const salesData = await salesRes.json()
 
-    console.log('XRPLTO RAW:', JSON.stringify(xrpltoRaw).slice(0, 500))
-
     const col = xrpltoRaw?.collection || xrpltoRaw?.data || xrpltoRaw || {}
 
-    const floorXrp = col?.floor || col?.floorPrice || col?.floor_price || null
-    const totalNfts = col?.supply || col?.totalSupply || col?.nftsCount || 3210
-    const totalOwners = col?.owners || col?.holders || col?.totalOwners || 640
-    const totalVolumeRaw = col?.totalVolume || col?.volume || col?.vol || null
-    const totalVolume = totalVolumeRaw ? parseFloat(totalVolumeRaw) : null
-    const listedRaw = col?.listed || col?.listedPct || col?.listingCount || null
-    const listed = listedRaw ? parseFloat(listedRaw) : null
+    const floorXrp = col?.floor || null
+    const totalNfts = col?.items || col?.totalNFTsMinted || 3211
+    const totalOwners = col?.owners || 642
+    const totalVolume = col?.totalVolume || null
+    const listed = col?.listedCount && col?.items
+      ? parseFloat(((col.listedCount / col.items) * 100).toFixed(1))
+      : null
 
     const sales = (salesData?.sales || []).map((sale: any) => {
       const nftoken = sale?.nftoken || {}
@@ -80,7 +78,6 @@ export async function GET() {
       totalVolume,
       listed,
       sales,
-      _debug: { xrpltoRaw }
     }
 
     cache = { data: result, timestamp: now }
