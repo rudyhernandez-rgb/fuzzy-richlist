@@ -239,7 +239,11 @@ export default function NFTs() {
 
             {/* Floor price chart */}
             <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
-
+<img
+  src="/sidebar-fuzzy.png"
+  alt="Fuzzybears"
+  style={{ width: '100%', borderRadius: '8px', border: '1px solid #222', display: 'block' }}
+/>
               {/* Chart header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <div>
