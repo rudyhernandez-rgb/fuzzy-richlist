@@ -239,8 +239,6 @@ export default function NFTs() {
 
             {/* Floor price chart */}
             <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
-
-              {/* Chart header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <div>
                   <div style={{ fontSize: '11px', color: '#888', letterSpacing: '0.05em', marginBottom: '4px' }}>FLOOR PRICE TREND</div>
@@ -258,12 +256,10 @@ export default function NFTs() {
                 />
               </div>
 
-              {/* Chart */}
               <div style={{ position: 'relative', width: '100%', height: '200px' }}>
                 <canvas ref={canvasRef}></canvas>
               </div>
 
-              {/* 3 boxes at bottom */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '14px' }}>
                 <div style={{ background: '#111', borderRadius: '8px', padding: '12px', border: '1px solid #222' }}>
                   <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px', letterSpacing: '0.04em' }}>24H CHANGE</div>
@@ -294,23 +290,18 @@ export default function NFTs() {
                 </div>
               </div>
 
-              {/* Watermark */}
               <div style={{ marginTop: '10px', fontSize: '10px', color: '#444', textAlign: 'right' }}>
                 fuzzyrichlist.com
               </div>
-
             </div>
           </div>
 
+          {/* Sidebar */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
+            {/* Floor price card */}
             <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
               <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '12px' }}>FLOOR PRICE</div>
-              <img
-  src="/sidebar-fuzzy.png"
-  alt="Fuzzybears"
-  style={{ width: '100%', borderRadius: '8px', border: '1px solid #222', display: 'block' }}
-/>
               <div style={{ fontSize: '28px', fontWeight: '500', color: '#FAC775' }}>
                 {stats?.floorXrp ? stats.floorXrp.toLocaleString() + ' XRP' : '...'}
               </div>
@@ -323,6 +314,31 @@ export default function NFTs() {
               {sideRow('30d change', pctLabel(stats?.floor30dPercent ?? null), pctColor(stats?.floor30dPercent ?? null))}
             </div>
 
+            {/* Buy Fuzzybear NFTs card */}
+            <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', overflow: 'hidden' }}>
+              <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', padding: '16px 16px 12px 16px' }}>BUY FUZZYBEAR NFTs</div>
+              <img
+                src="/sidebar-fuzzy.png"
+                alt="Fuzzybears"
+                style={{ width: '100%', display: 'block' }}
+              />
+              <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <a href="https://xrp.cafe/collection/fuzzybears" target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: '13px', color: '#FAC775', textDecoration: 'none' }}>
+                  View on XRP Cafe →
+                </a>
+                <a href="https://xrpl.to/nfts/fuzzybears" target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: '13px', color: '#FAC775', textDecoration: 'none' }}>
+                  View on XRPL.to →
+                </a>
+                <a href="https://bidds.com/collection/fuzzybears" target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: '13px', color: '#FAC775', textDecoration: 'none' }}>
+                  View on Bidds →
+                </a>
+              </div>
+            </div>
+
+            {/* Market stats card */}
             <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
               <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '12px' }}>MARKET STATS</div>
               {sideRow('24h volume', stats?.vol24h ? stats.vol24h.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' XRP' : '...')}
@@ -332,6 +348,7 @@ export default function NFTs() {
               {sideRow('Top offer', stats?.topOffer ? stats.topOffer.toLocaleString() + ' XRP' : '...')}
             </div>
 
+            {/* Collection info card */}
             <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
               <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '12px' }}>COLLECTION INFO</div>
               {[
@@ -346,20 +363,6 @@ export default function NFTs() {
                   <span style={{ fontWeight: '500' }}>{row.value}</span>
                 </div>
               ))}
-              <div style={{ marginTop: '12px', borderTop: '1px solid #222', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <a href="https://xrp.cafe/collection/fuzzybears" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: '12px', color: '#FAC775', textDecoration: 'none' }}>
-                  View on XRP Cafe →
-                </a>
-                <a href="https://xrpl.to/nfts/fuzzybears" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: '12px', color: '#FAC775', textDecoration: 'none' }}>
-                  View on XRPL.to →
-                </a>
-                <a href="https://bidds.com/collection/fuzzybears" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: '12px', color: '#FAC775', textDecoration: 'none' }}>
-                  View on Bidds →
-                </a>
-              </div>
             </div>
 
           </div>
