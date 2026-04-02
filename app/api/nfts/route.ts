@@ -104,6 +104,7 @@ export async function GET() {
       floor24hAgo,
       floor7dAgo,
       floor30dAgo,
+      attrs: col?.attrs || [],
     }
 
     cache = { data: result, timestamp: now }

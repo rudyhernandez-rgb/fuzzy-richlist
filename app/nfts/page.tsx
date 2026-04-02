@@ -14,6 +14,11 @@ interface Sale {
   marketplace: string
 }
 
+interface TraitItem {
+  name: string
+  count: number
+}
+
 interface NFTStats {
   floorXrp: number | null
   totalNfts: number
@@ -32,6 +37,7 @@ interface NFTStats {
   floor24hAgo: number | null
   floor7dAgo: number | null
   floor30dAgo: number | null
+  attrs: { title: string, items: Record<string, { count: number }> }[]
 }
 
 function shortAddr(addr: string) {
@@ -62,6 +68,7 @@ export default function NFTs() {
   const [stats, setStats] = useState<NFTStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [xrpUsdPrice, setXrpUsdPrice] = useState<number>(0.52)
+  const [selectedTrait, setSelectedTrait] = useState<string>('')
   const chartRef = useRef<any>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -70,6 +77,9 @@ export default function NFTs() {
       .then(res => res.json())
       .then(data => {
         setStats(data)
+        if (data?.attrs?.length > 0) {
+          setSelectedTrait(data.attrs[0].title)
+        }
         setLoading(false)
       })
       .catch(() => setLoading(false))
@@ -167,12 +177,21 @@ export default function NFTs() {
     </div>
   )
 
+  const selectedAttr = stats?.attrs?.find(a => a.title === selectedTrait)
+  const traitItems: TraitItem[] = selectedAttr
+    ? Object.entries(selectedAttr.items)
+        .map(([name, val]) => ({ name, count: val.count }))
+        .sort((a, b) => b.count - a.count)
+    : []
+  const maxTraitCount = traitItems.length > 0 ? traitItems[0].count : 1
+
   return (
     <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', fontFamily: 'sans-serif', color: 'white' }}>
       <style>{`
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
         .nft-img { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; background: #222; border: 1px solid #333; }
         .nft-img-placeholder { width: 56px; height: 56px; border-radius: 8px; background: #222; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .trait-select { width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px; padding: 6px 10px; font-size: 12px; cursor: pointer; margin-bottom: 12px; }
       `}</style>
 
       <Nav activePage="/nfts" />
@@ -336,6 +355,33 @@ export default function NFTs() {
                   View on Bidds →
                 </a>
               </div>
+            </div>
+
+            {/* Trait rarity card */}
+            <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
+              <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '12px' }}>TRAIT RARITY</div>
+              {stats?.attrs && stats.attrs.length > 0 && (
+                <select
+                  className="trait-select"
+                  value={selectedTrait}
+                  onChange={e => setSelectedTrait(e.target.value)}
+                >
+                  {stats.attrs.map(a => (
+                    <option key={a.title} value={a.title}>{a.title}</option>
+                  ))}
+                </select>
+              )}
+              {traitItems.slice(0, 10).map(item => (
+                <div key={item.name} style={{ marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '3px' }}>
+                    <span style={{ color: '#ccc' }}>{item.name}</span>
+                    <span style={{ color: '#888' }}>{((item.count / (stats?.totalNfts || 3211)) * 100).toFixed(1)}%</span>
+                  </div>
+                  <div style={{ height: '6px', background: '#222', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ width: `${Math.round((item.count / maxTraitCount) * 100)}%`, height: '100%', background: '#FAC775', borderRadius: '3px' }}></div>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Market stats card */}
