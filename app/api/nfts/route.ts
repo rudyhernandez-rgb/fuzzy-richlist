@@ -30,7 +30,7 @@ export async function GET() {
         { headers }
       ),
       fetch(
-        `https://bithomp.com/api/v2/nft-sales?issuer=${FUZZYBEARS_ISSUER}&taxon=${FUZZYBEARS_TAXON}&list=last&limit=10`,
+        `https://bithomp.com/api/v2/nft-sales?issuer=${FUZZYBEARS_ISSUER}&taxon=${FUZZYBEARS_TAXON}&limit=10`,
         { headers }
       )
     ])
@@ -38,15 +38,17 @@ export async function GET() {
     const collectionData = await collectionRes.json()
     const salesData = await salesRes.json()
 
-    // debug — remove later
-    console.log('COLLECTION DATA:', JSON.stringify(collectionData, null, 2))
-    console.log('SALES DATA:', JSON.stringify(salesData, null, 2))
-
     const collection = collectionData?.collection || {}
-    const statistics = collectionData?.statistics || {}
     const floorPrices = collection?.floorPrices || []
     const floorXrp = floorPrices?.[0]?.open?.amount
       ? parseInt(floorPrices[0].open.amount) / 1_000_000
+      : null
+
+    const totalNfts = collection?.nftsCount || collection?.totalNfts || 3210
+    const totalOwners = collection?.ownersCount || collection?.totalOwners || 640
+    const totalVolume = collection?.volumeXrp || collection?.volume || null
+    const listed = collection?.listedCount
+      ? parseFloat(((collection.listedCount / totalNfts) * 100).toFixed(2))
       : null
 
     const sales = (salesData?.sales || []).map((sale: any) => {
@@ -73,14 +75,13 @@ export async function GET() {
 
     const result = {
       floorXrp,
-      totalNfts: statistics?.totalNfts || collection?.totalNfts || 3210,
-      totalOwners: statistics?.totalOwners || collection?.totalOwners || 640,
-      totalVolume: statistics?.volumeXrp || null,
-      listed: statistics?.listed || null,
+      totalNfts,
+      totalOwners,
+      totalVolume,
+      listed,
       sales,
       _debug: {
-        collectionKeys: Object.keys(collectionData),
-        statisticsKeys: Object.keys(statistics),
+        collectionKeys: Object.keys(collection),
         salesRaw: salesData,
       }
     }
