@@ -371,7 +371,7 @@ export default function NFTs() {
                   ))}
                 </select>
               )}
-              {traitItems.slice(0, 10).map(item => (
+              {traitItems.map(item => (
                 <div key={item.name} style={{ marginBottom: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '3px' }}>
                     <span style={{ color: '#ccc' }}>{item.name}</span>
