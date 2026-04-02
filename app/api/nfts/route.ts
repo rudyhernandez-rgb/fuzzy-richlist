@@ -10,10 +10,13 @@ const CACHE_DURATION = 5 * 60 * 1000
 
 function ipfsToHttp(uri: string): string {
   if (!uri) return ''
-  if (uri.startsWith('ipfs://')) return IPFS_GATEWAY + uri.slice(7)
-  const ipfsMatch = uri.match(/\/ipfs\/(.+)/)
-  if (ipfsMatch) return IPFS_GATEWAY + ipfsMatch[1]
-  return uri
+  let path = uri
+  if (path.startsWith('ipfs://')) path = path.slice(7)
+  else {
+    const ipfsMatch = path.match(/\/ipfs\/(.+)/)
+    if (ipfsMatch) path = ipfsMatch[1]
+  }
+  return IPFS_GATEWAY + path.replace(/#/g, '%23')
 }
 
 export async function GET() {
