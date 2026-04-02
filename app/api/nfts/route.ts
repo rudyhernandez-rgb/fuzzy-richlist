@@ -30,13 +30,17 @@ export async function GET() {
         { headers }
       ),
       fetch(
-        `https://bithomp.com/api/v2/nft-sales?issuer=${FUZZYBEARS_ISSUER}&taxon=${FUZZYBEARS_TAXON}&list=last&limit=10&sale=secondary`,
+        `https://bithomp.com/api/v2/nft-sales?issuer=${FUZZYBEARS_ISSUER}&taxon=${FUZZYBEARS_TAXON}&list=last&limit=10`,
         { headers }
       )
     ])
 
     const collectionData = await collectionRes.json()
     const salesData = await salesRes.json()
+
+    // debug — remove later
+    console.log('COLLECTION DATA:', JSON.stringify(collectionData, null, 2))
+    console.log('SALES DATA:', JSON.stringify(salesData, null, 2))
 
     const collection = collectionData?.collection || {}
     const statistics = collectionData?.statistics || {}
@@ -74,6 +78,11 @@ export async function GET() {
       totalVolume: statistics?.volumeXrp || null,
       listed: statistics?.listed || null,
       sales,
+      _debug: {
+        collectionKeys: Object.keys(collectionData),
+        statisticsKeys: Object.keys(statistics),
+        salesRaw: salesData,
+      }
     }
 
     cache = { data: result, timestamp: now }
