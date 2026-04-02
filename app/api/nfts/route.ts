@@ -19,6 +19,11 @@ function ipfsToHttp(uri: string): string {
   return IPFS_GATEWAY + path.replace(/#/g, '%23')
 }
 
+function calcPct(from: number | null, to: number | null): number | null {
+  if (!from || !to || from === to) return null
+  return parseFloat((((to - from) / from) * 100).toFixed(2))
+}
+
 export async function GET() {
   try {
     const now = Date.now()
@@ -49,6 +54,14 @@ export async function GET() {
     const listed = listedCount && totalNfts
       ? parseFloat(((listedCount / totalNfts) * 100).toFixed(1))
       : null
+
+    const floor24hAgo = col?.floor24hAgo || null
+    const floor7dAgo = col?.floor7dAgo !== col?.floor ? col?.floor7dAgo || null : null
+    const floor30dAgo = col?.floor30dAgo || null
+
+    const floor1dPercent = col?.floor1dPercent || calcPct(floor24hAgo, floorXrp)
+    const floor7dPercent = col?.floor7dPercent || calcPct(floor7dAgo, floorXrp)
+    const floor30dPercent = col?.floor30dPercent || calcPct(floor30dAgo, floorXrp)
 
     const sales = (salesData?.sales || []).map((sale: any) => {
       const nftoken = sale?.nftoken || {}
@@ -85,12 +98,12 @@ export async function GET() {
       totalSales: col?.totalSales || null,
       marketcap: col?.marketcap?.amount || null,
       topOffer: col?.topOffer?.amount || null,
-      floor1dPercent: col?.floor1dPercent || null,
-      floor7dPercent: col?.floor7dPercent || null,
-      floor30dPercent: col?.floor30dPercent || null,
-      floor24hAgo: col?.floor24hAgo || null,
-      floor7dAgo: col?.floor7dAgo || null,
-      floor30dAgo: col?.floor30dAgo || null,
+      floor1dPercent,
+      floor7dPercent,
+      floor30dPercent,
+      floor24hAgo,
+      floor7dAgo,
+      floor30dAgo,
     }
 
     cache = { data: result, timestamp: now }
