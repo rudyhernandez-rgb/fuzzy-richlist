@@ -254,7 +254,7 @@ export default function NFTs() {
                 <img
                   src="/fuzzybears.png"
                   alt="Fuzzybears"
-                  style={{ width: '80px', height: '80px', borderRadius: '10px', border: '1px solid #333', objectFit: 'cover' }}
+                  style={{ width: '60px', height: '60px', borderRadius: '10px', border: '1px solid #333', objectFit: 'cover' }}
                 />
               </div>
 
