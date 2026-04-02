@@ -11,19 +11,11 @@ export default function Nav({ activePage }: NavProps) {
   const [change, setChange] = useState<number | null>(null)
 
   useEffect(() => {
-    fetch('/api/price?range=24h')
+    fetch('/api/price')
       .then(res => res.json())
       .then(data => {
-        if (data?.currentPrice) {
-          setPrice(data.currentPrice)
-        }
-        if (data?.candles?.length >= 2) {
-          const candles = data.candles
-          const first = candles[0][4]
-          const last = candles[candles.length - 1][4]
-          const pct = ((last - first) / first) * 100
-          setChange(pct)
-        }
+        if (data?.currentPrice) setPrice(data.currentPrice)
+        if (data?.change24h !== undefined) setChange(data.change24h)
       })
       .catch(() => {})
   }, [])
