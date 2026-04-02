@@ -30,6 +30,7 @@ export default function Nav({ activePage }: NavProps) {
     { label: 'Statistics', href: '/statistics' },
     { label: 'Whales', href: '/whales' },
     { label: 'Transactions', href: '/transactions' },
+    { label: 'NFTs', href: '/nfts' },
   ]
 
   return (

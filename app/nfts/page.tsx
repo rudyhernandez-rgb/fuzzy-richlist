@@ -40,7 +40,7 @@ function timeAgo(dateStr: string) {
 export default function NFTs() {
   const [stats, setStats] = useState<NFTStats | null>(null)
   const [loading, setLoading] = useState(true)
-  const [xrpPrice, setXrpPrice] = useState<number>(0.52)
+  const [xrpUsdPrice, setXrpUsdPrice] = useState<number>(0.52)
 
   useEffect(() => {
     fetch('/api/nfts')
@@ -51,17 +51,17 @@ export default function NFTs() {
       })
       .catch(() => setLoading(false))
 
-    fetch('/api/price')
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=ripple&vs_currencies=usd')
       .then(res => res.json())
       .then(data => {
-        if (data?.currentPrice) setXrpPrice(data.currentPrice)
+        if (data?.ripple?.usd) setXrpUsdPrice(data.ripple.usd)
       })
       .catch(() => {})
   }, [])
 
   const toUsd = (xrp: number | null) => {
-    if (!xrp || !xrpPrice) return '...'
-    return '$' + (xrp * xrpPrice).toLocaleString(undefined, { maximumFractionDigits: 0 })
+    if (!xrp || !xrpUsdPrice) return '...'
+    return '$' + (xrp * xrpUsdPrice).toLocaleString(undefined, { maximumFractionDigits: 0 })
   }
 
   const statCards = [
