@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 const FUZZYBEARS_ISSUER = 'rw1R8cfHGMySmbj7gJ1HkiCqTY1xhLGYAs'
 const FUZZYBEARS_TAXON = '1'
-const IPFS_GATEWAY = 'https://ipfs.io/ipfs/'
+const IPFS_GATEWAY = 'https://cloudflare-ipfs.com/ipfs/'
 
 let cache: { data: any, timestamp: number } | null = null
 const CACHE_DURATION = 5 * 60 * 1000
@@ -11,6 +11,9 @@ function ipfsToHttp(uri: string): string {
   if (!uri) return ''
   if (uri.startsWith('ipfs://')) {
     return IPFS_GATEWAY + uri.slice(7)
+  }
+  if (uri.startsWith('https://ipfs.io/ipfs/')) {
+    return uri.replace('https://ipfs.io/ipfs/', IPFS_GATEWAY)
   }
   return uri
 }
@@ -41,7 +44,6 @@ export async function GET() {
     const collection = collectionData?.collection || {}
     const floorPrices = collection?.floorPrices || []
 
-    // find the lowest open public floor price across all entries
     let floorXrp: number | null = null
     for (const fp of floorPrices) {
       const openAmount = fp?.open?.amount
@@ -66,10 +68,12 @@ export async function GET() {
       const rawImage = meta?.image || nftoken?.url || ''
       const image = ipfsToHttp(rawImage)
       const name = meta?.name || 'Fuzzybear'
-      const amountDrops = sale?.amount
-        ? parseInt(sale.amount)
-        : null
+      const amountDrops = sale?.amount ? parseInt(sale.amount) : null
       const amountXrp = amountDrops ? amountDrops / 1_000_000 : null
+
+      // soldAt is a Unix timestamp in seconds
+      const soldAtRaw = sale?.soldAt || sale?.acceptedAt || null
+      const soldAt = soldAtRaw ? new Date(soldAtRaw * 1000).toISOString() : ''
 
       return {
         nftokenID: sale.nftokenID,
@@ -78,7 +82,7 @@ export async function GET() {
         amountXrp,
         seller: sale.seller || '',
         buyer: sale.buyer || '',
-        soldAt: sale.soldAt || sale.acceptedAt || '',
+        soldAt,
         marketplace: sale.marketplace || '',
       }
     })
