@@ -239,11 +239,7 @@ export default function NFTs() {
 
             {/* Floor price chart */}
             <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
-<img
-  src="/sidebar-fuzzy.png"
-  alt="Fuzzybears"
-  style={{ width: '100%', borderRadius: '8px', border: '1px solid #222', display: 'block' }}
-/>
+
               {/* Chart header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <div>
@@ -310,6 +306,11 @@ export default function NFTs() {
 
             <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
               <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '12px' }}>FLOOR PRICE</div>
+              <img
+  src="/sidebar-fuzzy.png"
+  alt="Fuzzybears"
+  style={{ width: '100%', borderRadius: '8px', border: '1px solid #222', display: 'block' }}
+/>
               <div style={{ fontSize: '28px', fontWeight: '500', color: '#FAC775' }}>
                 {stats?.floorXrp ? stats.floorXrp.toLocaleString() + ' XRP' : '...'}
               </div>
