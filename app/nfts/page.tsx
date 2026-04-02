@@ -239,10 +239,66 @@ export default function NFTs() {
 
             {/* Floor price chart */}
             <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
-              <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '16px' }}>FLOOR PRICE TREND</div>
+
+              {/* Chart header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div>
+                  <div style={{ fontSize: '11px', color: '#888', letterSpacing: '0.05em', marginBottom: '4px' }}>FLOOR PRICE TREND</div>
+                  <div style={{ fontSize: '26px', fontWeight: '500', color: '#FAC775' }}>
+                    {stats?.floorXrp ? stats.floorXrp.toLocaleString() + ' XRP' : '...'}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>
+                    {stats?.floorXrp ? toUsd(stats.floorXrp) + ' USD' : ''}
+                  </div>
+                </div>
+                <img
+                  src="/fuzzybears.png"
+                  alt="Fuzzybears"
+                  style={{ width: '80px', height: '80px', borderRadius: '10px', border: '1px solid #333', objectFit: 'cover' }}
+                />
+              </div>
+
+              {/* Chart */}
               <div style={{ position: 'relative', width: '100%', height: '200px' }}>
                 <canvas ref={canvasRef}></canvas>
               </div>
+
+              {/* 3 boxes at bottom */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '14px' }}>
+                <div style={{ background: '#111', borderRadius: '8px', padding: '12px', border: '1px solid #222' }}>
+                  <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px', letterSpacing: '0.04em' }}>24H CHANGE</div>
+                  <div style={{ fontSize: '16px', fontWeight: '500', color: pctColor(stats?.floor1dPercent ?? null) }}>
+                    {pctLabel(stats?.floor1dPercent ?? null)}
+                  </div>
+                  <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
+                    {stats?.floor24hAgo && stats?.floorXrp ? stats.floor24hAgo + ' → ' + stats.floorXrp + ' XRP' : ''}
+                  </div>
+                </div>
+                <div style={{ background: '#111', borderRadius: '8px', padding: '12px', border: '1px solid #222' }}>
+                  <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px', letterSpacing: '0.04em' }}>7D CHANGE</div>
+                  <div style={{ fontSize: '16px', fontWeight: '500', color: pctColor(stats?.floor7dPercent ?? null) }}>
+                    {pctLabel(stats?.floor7dPercent ?? null)}
+                  </div>
+                  <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
+                    {stats?.floor7dAgo && stats?.floorXrp ? stats.floor7dAgo + ' → ' + stats.floorXrp + ' XRP' : ''}
+                  </div>
+                </div>
+                <div style={{ background: '#111', borderRadius: '8px', padding: '12px', border: '1px solid #222' }}>
+                  <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px', letterSpacing: '0.04em' }}>30D CHANGE</div>
+                  <div style={{ fontSize: '16px', fontWeight: '500', color: pctColor(stats?.floor30dPercent ?? null) }}>
+                    {pctLabel(stats?.floor30dPercent ?? null)}
+                  </div>
+                  <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
+                    {stats?.floor30dAgo && stats?.floorXrp ? stats.floor30dAgo + ' → ' + stats.floorXrp + ' XRP' : ''}
+                  </div>
+                </div>
+              </div>
+
+              {/* Watermark */}
+              <div style={{ marginTop: '10px', fontSize: '10px', color: '#444', textAlign: 'right' }}>
+                fuzzyrichlist.com
+              </div>
+
             </div>
           </div>
 
