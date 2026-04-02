@@ -88,6 +88,9 @@ export async function GET() {
       floor1dPercent: col?.floor1dPercent || null,
       floor7dPercent: col?.floor7dPercent || null,
       floor30dPercent: col?.floor30dPercent || null,
+      floor24hAgo: col?.floor24hAgo || null,
+      floor7dAgo: col?.floor7dAgo || null,
+      floor30dAgo: col?.floor30dAgo || null,
     }
 
     cache = { data: result, timestamp: now }

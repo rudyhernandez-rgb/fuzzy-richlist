@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Nav from '../components/Nav'
 
 interface Sale {
@@ -29,6 +29,9 @@ interface NFTStats {
   floor1dPercent: number | null
   floor7dPercent: number | null
   floor30dPercent: number | null
+  floor24hAgo: number | null
+  floor7dAgo: number | null
+  floor30dAgo: number | null
 }
 
 function shortAddr(addr: string) {
@@ -59,6 +62,8 @@ export default function NFTs() {
   const [stats, setStats] = useState<NFTStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [xrpUsdPrice, setXrpUsdPrice] = useState<number>(0.52)
+  const chartRef = useRef<any>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     fetch('/api/nfts')
@@ -76,6 +81,71 @@ export default function NFTs() {
       })
       .catch(() => {})
   }, [])
+
+  useEffect(() => {
+    if (!stats?.floorXrp || !canvasRef.current) return
+
+    const script = document.createElement('script')
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js'
+    script.onload = () => {
+      if (!canvasRef.current) return
+      if (chartRef.current) chartRef.current.destroy()
+
+      const labels = ['30d ago', '7d ago', '24h ago', 'Now']
+      const values = [
+        stats.floor30dAgo || 0,
+        stats.floor7dAgo || 0,
+        stats.floor24hAgo || 0,
+        stats.floorXrp || 0,
+      ]
+
+      const Chart = (window as any).Chart
+      chartRef.current = new Chart(canvasRef.current, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            data: values,
+            borderColor: '#FAC775',
+            backgroundColor: 'rgba(250,199,117,0.08)',
+            borderWidth: 2,
+            pointBackgroundColor: '#FAC775',
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            fill: true,
+            tension: 0.3,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx: any) => ctx.parsed.y + ' XRP'
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#666', font: { size: 11 } },
+              grid: { color: '#1a1a1a' }
+            },
+            y: {
+              ticks: {
+                color: '#666',
+                font: { size: 11 },
+                callback: (v: any) => v + ' XRP'
+              },
+              grid: { color: '#222' }
+            }
+          }
+        }
+      })
+    }
+    document.head.appendChild(script)
+  }, [stats])
 
   const toUsd = (xrp: number | null) => {
     if (!xrp || !xrpUsdPrice) return '...'
@@ -123,7 +193,7 @@ export default function NFTs() {
 
           <div>
             <div style={{ fontSize: '15px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '14px' }}>RECENT SALES</div>
-            <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', overflow: 'hidden' }}>
+            <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', overflow: 'hidden', marginBottom: '20px' }}>
               <div style={{ padding: '14px 16px', borderBottom: '1px solid #222', fontSize: '16px', fontWeight: '500' }}>
                 🐻 Latest Fuzzybear sales
               </div>
@@ -166,11 +236,18 @@ export default function NFTs() {
                 ))
               )}
             </div>
+
+            {/* Floor price chart */}
+            <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
+              <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '16px' }}>FLOOR PRICE TREND</div>
+              <div style={{ position: 'relative', width: '100%', height: '200px' }}>
+                <canvas ref={canvasRef}></canvas>
+              </div>
+            </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-            {/* Floor price card */}
             <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
               <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '12px' }}>FLOOR PRICE</div>
               <div style={{ fontSize: '28px', fontWeight: '500', color: '#FAC775' }}>
@@ -185,7 +262,6 @@ export default function NFTs() {
               {sideRow('30d change', pctLabel(stats?.floor30dPercent ?? null), pctColor(stats?.floor30dPercent ?? null))}
             </div>
 
-            {/* Market stats card */}
             <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
               <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '12px' }}>MARKET STATS</div>
               {sideRow('24h volume', stats?.vol24h ? stats.vol24h.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' XRP' : '...')}
@@ -195,7 +271,6 @@ export default function NFTs() {
               {sideRow('Top offer', stats?.topOffer ? stats.topOffer.toLocaleString() + ' XRP' : '...')}
             </div>
 
-            {/* Collection info card */}
             <div style={{ background: '#1a1a1a', borderRadius: '8px', border: '1px solid #222', padding: '16px' }}>
               <div style={{ fontSize: '13px', fontWeight: '500', color: '#888', letterSpacing: '0.05em', marginBottom: '12px' }}>COLLECTION INFO</div>
               {[
@@ -210,10 +285,18 @@ export default function NFTs() {
                   <span style={{ fontWeight: '500' }}>{row.value}</span>
                 </div>
               ))}
-              <div style={{ marginTop: '12px', borderTop: '1px solid #222', paddingTop: '12px' }}>
+              <div style={{ marginTop: '12px', borderTop: '1px solid #222', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <a href="https://xrp.cafe/collection/fuzzybears" target="_blank" rel="noopener noreferrer"
                   style={{ fontSize: '12px', color: '#FAC775', textDecoration: 'none' }}>
                   View on XRP Cafe →
+                </a>
+                <a href="https://xrpl.to/nfts/fuzzybears" target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: '12px', color: '#FAC775', textDecoration: 'none' }}>
+                  View on XRPL.to →
+                </a>
+                <a href="https://bidds.com/collection/fuzzybears" target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: '12px', color: '#FAC775', textDecoration: 'none' }}>
+                  View on Bidds →
                 </a>
               </div>
             </div>
