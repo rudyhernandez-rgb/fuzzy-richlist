@@ -40,9 +40,18 @@ export async function GET() {
 
     const collection = collectionData?.collection || {}
     const floorPrices = collection?.floorPrices || []
-    const floorXrp = floorPrices?.[0]?.open?.amount
-      ? parseInt(floorPrices[0].open.amount) / 1_000_000
-      : null
+
+    // find the lowest open public floor price across all entries
+    let floorXrp: number | null = null
+    for (const fp of floorPrices) {
+      const openAmount = fp?.open?.amount
+      if (openAmount) {
+        const xrp = parseInt(openAmount) / 1_000_000
+        if (floorXrp === null || xrp < floorXrp) {
+          floorXrp = xrp
+        }
+      }
+    }
 
     const totalNfts = collection?.nftsCount || collection?.totalNfts || 3210
     const totalOwners = collection?.ownersCount || collection?.totalOwners || 640
@@ -52,11 +61,12 @@ export async function GET() {
       : null
 
     const sales = (salesData?.sales || []).map((sale: any) => {
-      const meta = sale?.nftoken?.metadata || {}
-      const rawImage = meta?.image || ''
+      const nftoken = sale?.nftoken || {}
+      const meta = nftoken?.metadata || {}
+      const rawImage = meta?.image || nftoken?.url || ''
       const image = ipfsToHttp(rawImage)
       const name = meta?.name || 'Fuzzybear'
-      const amountDrops = typeof sale.amount === 'string'
+      const amountDrops = sale?.amount
         ? parseInt(sale.amount)
         : null
       const amountXrp = amountDrops ? amountDrops / 1_000_000 : null
@@ -68,7 +78,7 @@ export async function GET() {
         amountXrp,
         seller: sale.seller || '',
         buyer: sale.buyer || '',
-        soldAt: sale.soldAt || '',
+        soldAt: sale.soldAt || sale.acceptedAt || '',
         marketplace: sale.marketplace || '',
       }
     })
@@ -80,10 +90,6 @@ export async function GET() {
       totalVolume,
       listed,
       sales,
-      _debug: {
-        collectionKeys: Object.keys(collection),
-        salesRaw: salesData,
-      }
     }
 
     cache = { data: result, timestamp: now }
