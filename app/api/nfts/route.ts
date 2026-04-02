@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 const FUZZYBEARS_ISSUER = 'rw1R8cfHGMySmbj7gJ1HkiCqTY1xhLGYAs'
 const FUZZYBEARS_TAXON = '1'
 const XRPLTO_SLUG = 'fuzzybears'
-const IPFS_GATEWAY = 'https://cloudflare-ipfs.com/ipfs/'
+const IPFS_GATEWAY = 'https://gateway.pinata.cloud/ipfs/'
 
 let cache: { data: any, timestamp: number } | null = null
 const CACHE_DURATION = 5 * 60 * 1000
@@ -11,7 +11,8 @@ const CACHE_DURATION = 5 * 60 * 1000
 function ipfsToHttp(uri: string): string {
   if (!uri) return ''
   if (uri.startsWith('ipfs://')) return IPFS_GATEWAY + uri.slice(7)
-  if (uri.includes('ipfs.io/ipfs/')) return uri.replace('https://ipfs.io/ipfs/', IPFS_GATEWAY)
+  const ipfsMatch = uri.match(/\/ipfs\/(.+)/)
+  if (ipfsMatch) return IPFS_GATEWAY + ipfsMatch[1]
   return uri
 }
 
@@ -25,23 +26,29 @@ export async function GET() {
     const bithompHeaders = { 'x-bithomp-token': process.env.BITHOMP_API_KEY || '' }
 
     const [xrpltoRes, salesRes] = await Promise.all([
-      fetch(`https://api.xrpl.to/v1/nft/collections/${XRPLTO_SLUG}`),
+      fetch(`https://api.xrpl.to/v1/nft/collections/${XRPLTO_SLUG}`, {
+        headers: { 'Accept': 'application/json' }
+      }),
       fetch(
         `https://bithomp.com/api/v2/nft-sales?issuer=${FUZZYBEARS_ISSUER}&taxon=${FUZZYBEARS_TAXON}&limit=10`,
         { headers: bithompHeaders }
       )
     ])
 
-    const xrpltoData = await xrpltoRes.json()
+    const xrpltoRaw = await xrpltoRes.json()
     const salesData = await salesRes.json()
 
-    const col = xrpltoData?.collection || xrpltoData || {}
+    console.log('XRPLTO RAW:', JSON.stringify(xrpltoRaw).slice(0, 500))
 
-    const floorXrp = col?.floorPrice || col?.floor || col?.floor_price || null
-    const totalNfts = col?.supply || col?.totalNfts || col?.nftsCount || 3210
-    const totalOwners = col?.owners || col?.totalOwners || col?.ownersCount || 640
-    const totalVolume = col?.totalVolume || col?.volume || col?.vol || null
-    const listed = col?.listed || col?.listedPct || null
+    const col = xrpltoRaw?.collection || xrpltoRaw?.data || xrpltoRaw || {}
+
+    const floorXrp = col?.floor || col?.floorPrice || col?.floor_price || null
+    const totalNfts = col?.supply || col?.totalSupply || col?.nftsCount || 3210
+    const totalOwners = col?.owners || col?.holders || col?.totalOwners || 640
+    const totalVolumeRaw = col?.totalVolume || col?.volume || col?.vol || null
+    const totalVolume = totalVolumeRaw ? parseFloat(totalVolumeRaw) : null
+    const listedRaw = col?.listed || col?.listedPct || col?.listingCount || null
+    const listed = listedRaw ? parseFloat(listedRaw) : null
 
     const sales = (salesData?.sales || []).map((sale: any) => {
       const nftoken = sale?.nftoken || {}
@@ -73,7 +80,7 @@ export async function GET() {
       totalVolume,
       listed,
       sales,
-      _debug: { xrpltoKeys: Object.keys(col), xrpltoSample: col }
+      _debug: { xrpltoRaw }
     }
 
     cache = { data: result, timestamp: now }
