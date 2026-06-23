@@ -64,17 +64,17 @@ export default function Whales() {
           <div style={{ background: '#1a1a1a', borderRadius: '8px', padding: '16px', border: '1px solid #222' }}>
             <div style={{ fontSize: '14px', color: '#888', marginBottom: '4px', letterSpacing: '0.04em' }}>WHALE COUNT</div>
             <div style={{ fontSize: '22px', fontWeight: '500' }}>{loading ? '...' : holders.length}</div>
-            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>wallets holding &gt; 1B FUZZY</div>
+            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>wallets holding &gt; 1B FUZZY (incl. AMM Pool)</div>
           </div>
           <div style={{ background: '#1a1a1a', borderRadius: '8px', padding: '16px', border: '1px solid #222' }}>
             <div style={{ fontSize: '14px', color: '#888', marginBottom: '4px', letterSpacing: '0.04em' }}>WHALE SUPPLY</div>
             <div style={{ fontSize: '22px', fontWeight: '500' }}>{loading ? '...' : formatAmount(whaleSupply)} FUZZY</div>
-            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>combined holdings</div>
+            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>combined holdings (incl. AMM Pool)</div>
           </div>
           <div style={{ background: '#1a1a1a', borderRadius: '8px', padding: '16px', border: '1px solid #222' }}>
             <div style={{ fontSize: '14px', color: '#888', marginBottom: '4px', letterSpacing: '0.04em' }}>% OF SUPPLY</div>
             <div style={{ fontSize: '22px', fontWeight: '500' }}>{whalePct}%</div>
-            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>controlled by whales</div>
+            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>held by whales incl. AMM Pool</div>
           </div>
         </div>
 
