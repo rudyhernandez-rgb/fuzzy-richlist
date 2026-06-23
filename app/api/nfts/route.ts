@@ -57,8 +57,10 @@ export async function GET() {
       console.log('Bithomp fetch failed:', e.message)
     }
 
-    const col = xrpltoText ? JSON.parse(xrpltoText) : {}
-    const salesData = salesText ? JSON.parse(salesText) : {}
+    let col: any = {}
+    let salesData: any = {}
+    try { col = xrpltoText ? JSON.parse(xrpltoText) : {} } catch (e: any) { console.log('XRPLTO parse failed:', xrpltoText.slice(0, 300)) }
+    try { salesData = salesText ? JSON.parse(salesText) : {} } catch (e: any) { console.log('Bithomp parse failed:', salesText.slice(0, 300)) }
 
     const floorXrp = col?.floor || null
     const totalNfts = col?.items || 3211
