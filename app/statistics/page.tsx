@@ -230,7 +230,7 @@ export default function Statistics() {
             <div style={{ fontSize: '19px', fontWeight: '500', marginBottom: '20px' }}>Supply concentration</div>
             {[
               { label: 'Top 10 wallets', pct: parseFloat(top10Pct as string), color: '#FAC775' },
-              { label: 'Top 50 wallets', pct: parseFloat(top50Pct as string), color: '#EF9F27' },
+              { label: 'Top 50 wallets (includes top 10)', pct: parseFloat(top50Pct as string), color: '#EF9F27' },
               { label: 'Rest of holders', pct: parseFloat(restPct as string), color: '#444' },
             ].map(row => (
               <div key={row.label} style={{ marginBottom: '16px' }}>
