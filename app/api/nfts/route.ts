@@ -33,23 +33,32 @@ export async function GET() {
 
     const bithompHeaders = { 'x-bithomp-token': process.env.BITHOMP_API_KEY || '' }
 
-    const [xrpltoRes, salesRes] = await Promise.all([
-      fetch(`https://api.xrpl.to/v1/nft/collections/${XRPLTO_SLUG}`, {
+    let xrpltoText = ''
+    let salesText = ''
+
+    try {
+      const xrpltoRes = await fetch(`https://api.xrpl.to/v1/nft/collections/${XRPLTO_SLUG}`, {
         headers: { 'Accept': 'application/json' }
-      }),
-      fetch(
+      })
+      xrpltoText = await xrpltoRes.text()
+      console.log('XRPLTO status:', xrpltoRes.status, xrpltoText.slice(0, 300))
+    } catch (e: any) {
+      console.log('XRPLTO fetch failed:', e.message)
+    }
+
+    try {
+      const salesRes = await fetch(
         `https://bithomp.com/api/v2/nft-sales?issuer=${FUZZYBEARS_ISSUER}&taxon=${FUZZYBEARS_TAXON}&limit=10`,
         { headers: bithompHeaders }
       )
-    ])
+      salesText = await salesRes.text()
+      console.log('Bithomp status:', salesRes.status, salesText.slice(0, 300))
+    } catch (e: any) {
+      console.log('Bithomp fetch failed:', e.message)
+    }
 
-    const xrpltoText = await xrpltoRes.text()
-    const salesText = await salesRes.text()
-    console.log('XRPLTO status:', xrpltoRes.status, xrpltoText.slice(0, 200))
-    console.log('Bithomp status:', salesRes.status, salesText.slice(0, 200))
-
-    const col = JSON.parse(xrpltoText)
-    const salesData = JSON.parse(salesText)
+    const col = xrpltoText ? JSON.parse(xrpltoText) : {}
+    const salesData = salesText ? JSON.parse(salesText) : {}
 
     const floorXrp = col?.floor || null
     const totalNfts = col?.items || 3211
