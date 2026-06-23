@@ -110,8 +110,8 @@ export async function GET() {
     cache = { data: result, timestamp: now }
     return NextResponse.json(result)
 
-  } catch (error) {
-    console.error('NFT API error:', error)
-    return NextResponse.json({ error: 'Failed to fetch NFT data' }, { status: 500 })
-  }
+  } catch (error: any) {
+  console.error('NFT API error:', error)
+  return NextResponse.json({ error: error?.message || String(error) }, { status: 500 })
+}
 }
