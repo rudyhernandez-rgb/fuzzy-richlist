@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server'
 
 const FUZZY_CURRENCY = '46555A5A59000000000000000000000000000000'
 const FUZZY_ISSUER = 'rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62'
+const AMM_WALLET = 'rBudi9ArACZzLrReUWKFZmHve13LD7CbrM'
 
 function formatAmount(val: number): string | null {
-  if (!isFinite(val) || isNaN(val) || val > 321_000_000_000) return null
+  if (!isFinite(val) || isNaN(val) || val > 10_000_000_000) return null
   if (val >= 1_000_000_000) return (val / 1_000_000_000).toFixed(2) + 'B'
   if (val >= 1_000_000) return (val / 1_000_000).toFixed(2) + 'M'
   if (val >= 1_000) return (val / 1_000).toFixed(2) + 'K'
@@ -34,8 +35,11 @@ export async function GET() {
     const moves = txList
       .filter((t: any) => {
         const tx = t.tx || t.tx_json
-        return tx?.TransactionType === 'Payment' &&
-          tx?.Amount?.currency === FUZZY_CURRENCY
+        if (tx?.TransactionType !== 'Payment') return false
+        if (tx?.Amount?.currency !== FUZZY_CURRENCY) return false
+        if (tx?.Account === FUZZY_ISSUER || tx?.Destination === FUZZY_ISSUER) return false
+        if (tx?.Account === AMM_WALLET || tx?.Destination === AMM_WALLET) return false
+        return true
       })
       .map((t: any) => {
         const tx = t.tx || t.tx_json
