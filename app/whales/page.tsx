@@ -20,6 +20,7 @@ function formatAmount(val: number): string {
 }
 
 const WHALE_THRESHOLD = 1_000_000_000
+const AMM_WALLET = 'rBudi9ArACZzLrReUWKFZmHve13LD7CbrM'
 
 export default function Whales() {
   const [holders, setHolders] = useState<Holder[]>([])
@@ -104,7 +105,12 @@ export default function Whales() {
                     <tr key={holder.account} style={{ borderBottom: '1px solid #222' }}>
                       <td style={{ padding: '12px 20px', color: '#666' }}>{i + 1}</td>
                       <td style={{ padding: '12px 8px' }}>
-                        <div style={{ fontFamily: 'monospace', color: '#FAC775', fontSize: '19px' }}>{shortAddr(holder.account)}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontFamily: 'monospace', color: '#FAC775', fontSize: '19px' }}>{shortAddr(holder.account)}</span>
+                          {holder.account === AMM_WALLET && (
+                            <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '20px', background: '#1a2e3a', color: '#5B9FCC' }}>AMM Pool</span>
+                          )}
+                        </div>
                         <div style={{ fontSize: '17px', color: '#666', marginTop: '2px', fontFamily: 'monospace' }}>{holder.account}</div>
                       </td>
                       <td style={{ padding: '12px 8px', textAlign: 'right', fontWeight: '500', fontSize: '19px' }}>{formatAmount(holder.rawBalance)} FUZZY</td>
