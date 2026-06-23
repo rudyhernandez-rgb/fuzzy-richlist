@@ -43,8 +43,13 @@ export async function GET() {
       )
     ])
 
-    const col = await xrpltoRes.json()
-    const salesData = await salesRes.json()
+    const xrpltoText = await xrpltoRes.text()
+    const salesText = await salesRes.text()
+    console.log('XRPLTO status:', xrpltoRes.status, xrpltoText.slice(0, 200))
+    console.log('Bithomp status:', salesRes.status, salesText.slice(0, 200))
+
+    const col = JSON.parse(xrpltoText)
+    const salesData = JSON.parse(salesText)
 
     const floorXrp = col?.floor || null
     const totalNfts = col?.items || 3211
@@ -111,7 +116,7 @@ export async function GET() {
     return NextResponse.json(result)
 
   } catch (error: any) {
-  console.error('NFT API error:', error)
-  return NextResponse.json({ error: error?.message || String(error) }, { status: 500 })
-}
+    console.error('NFT API error:', error)
+    return NextResponse.json({ error: error?.message || String(error) }, { status: 500 })
+  }
 }
